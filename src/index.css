@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", "Segoe UI", sans-serif;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --color-bg: #070910;
+  --color-panel: #10151f;
+  --color-panel-raised: #171e2c;
+  --color-line: #2a3548;
+  --color-text: #edf2f7;
+  --color-muted: #93a0b5;
+  --color-up: #2fce8f;
+  --color-down: #ff5c6a;
+  --color-accent: #7c6cff;
+  --color-accent-strong: #6757f0;
+  --color-accent-soft: #d5cfff;
+  --color-warn: #e7b15a;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(124, 108, 255, 0.08), transparent 55%),
+    var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: #7c6cff;
+  color: #fff;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a3548 transparent;
+}
+
+.desk-grid {
+  background-image:
+    linear-gradient(to right, rgba(237, 242, 247, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(237, 242, 247, 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, #000 20%, transparent 90%);
+}
+
+.demo-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--color-warn);
+  box-shadow: 0 0 0 0 rgba(231, 177, 90, 0.7);
+  animation: demo-pulse 2.4s ease-out infinite;
+}
+
+.ticker-track {
+  animation: ticker 36s linear infinite;
+}
+
+.rise {
+  animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.rise-late {
+  animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+.draw-line {
+  stroke-dasharray: 640;
+  stroke-dashoffset: 640;
+  animation: draw 2.4s ease forwards 0.3s;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes demo-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(231, 177, 90, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 8px rgba(231, 177, 90, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
