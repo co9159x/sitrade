@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { AdminLayout, UserLayout } from '@/layouts/AppShell'
 import { AuthLayout } from '@/layouts/AuthLayout'
 import { AdminLoginPage } from '@/pages/admin/AdminLoginPage'
@@ -61,6 +61,7 @@ export function AppRoutes() {
         </Route>
       </Route>
       <Route path={paths.adminLogin} element={<AdminLoginPage />} />
+      <Route path="/admin" element={<Navigate to={paths.adminDashboard} replace />} />
       <Route element={<AdminRoute />}>
         <Route element={<AdminLayout />}>
           <Route path={paths.adminDashboard} element={<AdminDashboardPage />} />

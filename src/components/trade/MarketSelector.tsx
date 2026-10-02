@@ -24,7 +24,7 @@ export function MarketSelector({
   const rows = source.filter((item) => !needle || item.symbol.toLowerCase().includes(needle) || item.name.toLowerCase().includes(needle))
 
   return (
-    <section className="flex min-h-80 flex-col rounded-lg border border-line bg-panel">
+    <section className="flex flex-col rounded-lg border border-line bg-panel xl:min-h-80">
       <div className="border-b border-line p-3">
         <Tabs
           label="Market lists"
@@ -53,7 +53,7 @@ export function MarketSelector({
           body="Pairs and watchlists load from the database. Nothing is hardcoded in this list."
         />
       ) : (
-        <ul className="max-h-96 overflow-y-auto" role="listbox" aria-label="Trading pairs">
+        <ul className="max-h-64 overflow-y-auto xl:max-h-96" role="listbox" aria-label="Trading pairs">
           {rows.map((item) => (
             <li key={item.id}>
               <button

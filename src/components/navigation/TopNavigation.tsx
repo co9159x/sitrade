@@ -30,10 +30,10 @@ export function TopNavigation({
   return (
     <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-line bg-bg px-3 md:px-4">
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" className="md:hidden" aria-label="Open navigation" onClick={onMenu}>
+        <Button variant="ghost" size="sm" className="lg:hidden" aria-label="Open navigation" onClick={onMenu}>
           <Menu className="h-4 w-4" aria-hidden="true" />
         </Button>
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <LogoLink compact />
         </div>
         <p className="hidden font-display text-sm tracking-[0.16em] text-muted sm:block">

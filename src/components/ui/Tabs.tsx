@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+
 export function Tabs({
   label,
   tabs,
@@ -9,20 +11,42 @@ export function Tabs({
   value: string
   onChange: (id: string) => void
 }) {
+  const refs = useRef<Array<HTMLButtonElement | null>>([])
+
+  function move(index: number, key: string) {
+    let next = index
+    if (key === 'ArrowRight') next = (index + 1) % tabs.length
+    else if (key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length
+    else if (key === 'Home') next = 0
+    else if (key === 'End') next = tabs.length - 1
+    else return
+    onChange(tabs[next].id)
+    refs.current[next]?.focus()
+  }
+
   return (
     <div className="flex gap-1 overflow-x-auto" role="tablist" aria-label={label}>
-      {tabs.map((tab) => {
+      {tabs.map((tab, index) => {
         const selected = tab.id === value
         return (
           <button
             key={tab.id}
+            ref={(node) => { refs.current[index] = node }}
             type="button"
             role="tab"
+            id={`tab-${label.replace(/\s+/g, '-')}-${tab.id}`}
             aria-selected={selected}
+            tabIndex={selected ? 0 : -1}
             className={`h-9 shrink-0 rounded-md px-3 text-xs font-medium ${
               selected ? 'bg-panel-raised text-text' : 'text-muted hover:text-text'
             }`}
             onClick={() => onChange(tab.id)}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowRight' || event.key === 'ArrowLeft' || event.key === 'Home' || event.key === 'End') {
+                event.preventDefault()
+                move(index, event.key)
+              }
+            }}
           >
             {tab.label}
           </button>

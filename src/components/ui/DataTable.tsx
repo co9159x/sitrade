@@ -27,9 +27,14 @@ export function DataTable({
   emptyBody: string
   loading?: boolean
 }) {
-  const title = loading ? 'Loading records' : emptyTitle
-  const body = loading ? 'Reading this account from the database.' : emptyBody
   const visibleRows = loading ? [] : rows
+  const skeleton = (
+    <div className="space-y-2 px-4 py-4" aria-hidden="true">
+      {Array.from({ length: 4 }, (_, index) => (
+        <div key={index} className="h-8 animate-pulse rounded bg-panel-raised" />
+      ))}
+    </div>
+  )
   return (
     <div className="overflow-hidden rounded-lg border border-line bg-panel">
       <div className="hidden overflow-x-auto md:block">
@@ -49,10 +54,17 @@ export function DataTable({
             </tr>
           </thead>
           <tbody>
-            {visibleRows.length === 0 ? (
+            {loading ? (
               <tr>
                 <td colSpan={columns.length}>
-                  <EmptyState title={title} body={body} />
+                  <p className="sr-only">Loading records</p>
+                  {skeleton}
+                </td>
+              </tr>
+            ) : visibleRows.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length}>
+                  <EmptyState title={emptyTitle} body={emptyBody} />
                 </td>
               </tr>
             ) : (
@@ -73,16 +85,21 @@ export function DataTable({
         </table>
       </div>
       <div className="md:hidden">
-        {visibleRows.length === 0 ? (
-          <EmptyState title={title} body={body} />
+        {loading ? (
+          <>
+            <p className="sr-only">Loading records</p>
+            {skeleton}
+          </>
+        ) : visibleRows.length === 0 ? (
+          <EmptyState title={emptyTitle} body={emptyBody} />
         ) : (
           <ul className="divide-y divide-line">
             {visibleRows.map((row) => (
               <li key={row.id} className="space-y-2 px-4 py-3">
                 {columns.map((column) => (
                   <div key={column.key} className="flex items-start justify-between gap-4 text-sm">
-                    <span className="text-xs text-muted">{column.label}</span>
-                    <span className="text-right">{row.cells[column.key]}</span>
+                    <span className="shrink-0 text-xs text-muted">{column.label}</span>
+                    <span className="min-w-0 text-right break-words">{row.cells[column.key]}</span>
                   </div>
                 ))}
               </li>

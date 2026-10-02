@@ -29,7 +29,7 @@ export function TradingChart({ providerAssetId, symbol }: { providerAssetId: str
   }
 
   return (
-    <section id="trading-chart" className="flex min-h-[420px] flex-col border border-line bg-panel">
+    <section id="trading-chart" className="flex min-h-72 flex-col border border-line bg-panel sm:min-h-[420px]">
       <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2">
         <div className="flex gap-1" role="group" aria-label="Timeframe">
           {timeframes.map((item) => (

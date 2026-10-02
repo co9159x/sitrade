@@ -18,8 +18,8 @@ export function TradeHeader({
   const pair = symbol ? `${symbol}/${currency}` : 'Not selected'
 
   return (
-    <section className="grid gap-3 rounded-lg border border-line bg-panel p-4 sm:grid-cols-2 xl:grid-cols-6">
-      <div>
+    <section className="grid grid-cols-2 gap-3 rounded-lg border border-line bg-panel p-4 xl:grid-cols-6">
+      <div className="col-span-2 sm:col-span-1">
         <p className="text-xs text-muted">Pair</p>
         <p className="mt-1 font-display text-2xl tracking-wide">{pair}</p>
         {name ? <p className="text-xs text-muted">{name}</p> : null}

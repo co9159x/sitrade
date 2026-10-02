@@ -143,7 +143,7 @@ export async function loadDesk(): Promise<DeskSnapshot> {
     query('Transactions', supabase.from('transactions').select('id, type, amount, status, created_at, assets(symbol)').order('created_at', { ascending: false }).limit(200)),
     query('Notifications', supabase.from('notifications').select('id, title, body, read, created_at').order('created_at', { ascending: false }).limit(50)),
     query('Watchlist', supabase.from('watchlists').select('asset_id, assets(id, symbol, name)')),
-    optionalQuery(supabase.from('trading_pairs').select('id, symbol, trading_enabled, min_order, base:assets!trading_pairs_base_asset_id_fkey(symbol, provider_asset_id), quote:assets!trading_pairs_quote_asset_id_fkey(symbol, provider_asset_id)').eq('trading_enabled', true).order('symbol')),
+    optionalQuery(supabase.from('trading_pairs').select('id, symbol, trading_enabled, min_order, base:assets!trading_pairs_base_asset_id_fkey(symbol, provider_asset_id, listed, trading_enabled), quote:assets!trading_pairs_quote_asset_id_fkey(symbol, provider_asset_id, listed, trading_enabled)').eq('trading_enabled', true).order('symbol')),
     optionalQuery(supabase.from('platform_settings').select('taker_fee_rate').limit(1)),
   ])
   const feeValue = settings[0]?.taker_fee_rate
@@ -155,6 +155,7 @@ export async function loadDesk(): Promise<DeskSnapshot> {
       const quote = related(row.quote)
       const id = text(row, 'id')
       if (!id || !base || !quote) return []
+      if (base.listed !== true || quote.listed !== true || base.trading_enabled !== true || quote.trading_enabled !== true) return []
       return [{
         id,
         symbol: text(row, 'symbol'),

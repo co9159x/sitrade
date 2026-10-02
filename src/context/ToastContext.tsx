@@ -46,13 +46,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={value}>
       {children}
       <div
-        className="pointer-events-none fixed right-4 bottom-20 z-50 flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2 md:bottom-4"
+        className="pointer-events-none fixed right-3 bottom-24 z-50 flex w-[min(22rem,calc(100vw-1.5rem))] flex-col gap-2 lg:right-4 lg:bottom-4"
         aria-live="polite"
       >
         {toasts.map((toast) => (
           <article
             key={toast.id}
-            className={`pointer-events-auto rounded-lg border bg-panel px-3 py-3 ${
+            role="status"
+            className={`pointer-events-auto rounded-lg border bg-panel px-3 py-3 shadow-none ${
               toast.tone === 'error'
                 ? 'border-down'
                 : toast.tone === 'success'
@@ -70,6 +71,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 className="text-xs text-muted hover:text-text"
+                aria-label={`Dismiss ${toast.title}`}
                 onClick={() => dismiss(toast.id)}
               >
                 Close

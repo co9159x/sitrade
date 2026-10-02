@@ -15,17 +15,19 @@ export function Pager({
         type="button"
         className="h-9 rounded-md border border-line px-3 disabled:opacity-40"
         disabled={page <= 1}
+        aria-label="Previous page"
         onClick={() => onPage(page - 1)}
       >
         Previous
       </button>
-      <p className="font-mono text-xs text-muted">
-        {page} / {pageCount}
+      <p className="font-mono text-xs text-muted" aria-live="polite">
+        Page {page} of {pageCount}
       </p>
       <button
         type="button"
         className="h-9 rounded-md border border-line px-3 disabled:opacity-40"
         disabled={page >= pageCount}
+        aria-label="Next page"
         onClick={() => onPage(page + 1)}
       >
         Next

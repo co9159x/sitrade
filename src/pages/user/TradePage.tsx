@@ -59,16 +59,23 @@ export function TradePage() {
       ) : null}
       {desk.status === 'error' && desk.error ? <Notice title="Records unavailable">{desk.error}</Notice> : null}
       <TradeHeader symbol={selected?.symbol ?? null} name={selected?.name} price={price} />
+      <a href="#order-entry" className="text-sm text-accent-soft underline-offset-2 hover:underline xl:hidden">
+        Jump to order ticket
+      </a>
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[260px_minmax(0,1fr)_300px]">
-        <MarketSelector
-          assets={quoted.assets}
-          watchlist={desk.watchlist}
-          selectedSymbol={selected?.symbol ?? null}
-          loading={loading}
-          onSelect={(next) => setParams({ symbol: next })}
-        />
-        <TradingChart providerAssetId={selected?.providerAssetId ?? null} symbol={selected?.symbol ?? null} />
-        <div className="flex flex-col gap-3">
+        <div>
+          <MarketSelector
+            assets={quoted.assets}
+            watchlist={desk.watchlist}
+            selectedSymbol={selected?.symbol ?? null}
+            loading={loading}
+            onSelect={(next) => setParams({ symbol: next })}
+          />
+        </div>
+        <div>
+          <TradingChart providerAssetId={selected?.providerAssetId ?? null} symbol={selected?.symbol ?? null} />
+        </div>
+        <div id="order-entry" className="flex scroll-mt-4 flex-col gap-3">
           <OrderBook />
           <OrderForm
             pair={pair}
@@ -81,7 +88,7 @@ export function TradePage() {
       </div>
       <section className="rounded-lg border border-line bg-panel p-3">
         <Tabs label="Activity" tabs={bottomTabs} value={tab} onChange={setTab} />
-        <div className="mt-3" role="tabpanel">
+        <div className="mt-3" role="tabpanel" aria-labelledby={`tab-Activity-${tab}`}>
           {tab === 'recent' ? (
             <RecentTrades />
           ) : tab === 'trades' ? (

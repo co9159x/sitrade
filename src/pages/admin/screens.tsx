@@ -1,8 +1,12 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { AccountControls } from '@/components/admin/AccountControls'
 import { ActivityBars } from '@/components/admin/ActivityBars'
+import { AdminOrderCancel } from '@/components/admin/AdminOrderCancel'
+import { AssetControls } from '@/components/admin/AssetControls'
 import { BalanceAdjust } from '@/components/admin/BalanceAdjust'
 import { DepositReview } from '@/components/admin/DepositReview'
+import { FeeSettings } from '@/components/admin/FeeSettings'
 import { WithdrawalReview } from '@/components/admin/WithdrawalReview'
 import { AdminTable } from '@/components/tables/AdminTable'
 import { AppPage } from '@/components/ui/AppPage'
@@ -15,7 +19,7 @@ import type { TableRow } from '@/components/ui/DataTable'
 import { adminEmpty, useAdminDesk } from '@/hooks/useAdminDesk'
 import { useAuth } from '@/hooks/useAuth'
 import { paths } from '@/routes/paths'
-import type { AdminProfile } from '@/services/adminDesk'
+import type { AdminAsset, AdminPair, AdminProfile } from '@/services/adminDesk'
 import { EMPTY_VALUE, formatAmount, formatDateTime, labelize } from '@/utils/format'
 
 const pageSize = 8
@@ -36,6 +40,20 @@ function when(iso: string) {
 
 function flag(on: boolean) {
   return <span className={on ? 'text-up' : 'text-muted'}>{on ? 'On' : 'Off'}</span>
+}
+
+function assetMark(assets: AdminAsset[], symbol: string) {
+  if (!symbol) return EMPTY_VALUE
+  const asset = assets.find((item) => item.symbol === symbol)
+  return asset && !asset.listed ? `${symbol} · delisted` : symbol
+}
+
+function pairMark(assets: AdminAsset[], pairs: AdminPair[], symbol: string) {
+  if (!symbol) return EMPTY_VALUE
+  const pair = pairs.find((item) => item.symbol === symbol)
+  if (!pair) return symbol
+  const closed = [pair.baseAssetId, pair.quoteAssetId].some((id) => assets.some((asset) => asset.id === id && !asset.listed))
+  return closed ? `${symbol} · delisted` : symbol
 }
 
 function matches(query: string, parts: string[]) {
@@ -122,7 +140,7 @@ export function AdminDashboardPage() {
             cells: {
               user: person(desk.profiles, row.userId),
               type: labelize(row.type),
-              asset: row.symbol,
+              asset: assetMark(desk.assets, row.symbol),
               amount: formatAmount(row.amount),
               date: when(row.createdAt),
             },
@@ -136,21 +154,9 @@ export function AdminDashboardPage() {
   )
 }
 
-function RecordActions({ children }: { children: string }) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {children.split('|').map((label) => (
-        <Button key={label} variant="secondary" size="sm" disabled>
-          {label}
-        </Button>
-      ))}
-    </div>
-  )
-}
-
 export function AdminUsersPage() {
   const desk = useAdminDesk()
-  const { configured } = useAuth()
+  const { configured, profile } = useAuth()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<string | null>(null)
   const lastActivity = useMemo(() => {
@@ -187,14 +193,14 @@ export function AdminUsersPage() {
   return (
     <AppPage
       title="Users"
-      description="Training accounts. Passwords are never loaded. Balance changes are saved through an audited adjustment. Suspend and reactivate stay closed."
+      description="Training accounts. Passwords are never loaded. Suspension, reactivation, role changes, and balance adjustments are audited."
       notice={desk.status === 'error' && desk.error ? <Notice title="Records unavailable">{desk.error}</Notice> : undefined}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="w-full max-w-sm">
           <TextField id="users-search" label="Search" value={query} onChange={(event) => { setQuery(event.target.value); paging.setPage(1) }} />
         </div>
-        <p className="text-xs text-muted">Open a user to adjust a simulated balance.</p>
+        <p className="text-xs text-muted">Open a user to change status or adjust a simulated balance.</p>
       </div>
       <AdminTable
         caption="Users"
@@ -237,9 +243,17 @@ export function AdminUsersPage() {
             <Link className="text-warn" to={`${paths.adminDeposits}?user=${user.id}`}>Deposits</Link>
             <Link className="text-warn" to={`${paths.adminWithdrawals}?user=${user.id}`}>Withdrawals</Link>
           </div>
+          <AccountControls
+            key={user.id}
+            userId={user.id}
+            role={user.role}
+            status={user.status}
+            callerId={profile?.id ?? null}
+            callerRole={profile?.role ?? null}
+            configured={configured && desk.status === 'ready'}
+            onSaved={desk.reload}
+          />
           <div className="mt-4">
-            <RecordActions>Suspend|Reactivate</RecordActions>
-            <p className="mt-2 text-xs text-muted">Account status changes stay disabled. Balance changes use the form below and are written with an audit log.</p>
             <BalanceAdjust
               userId={user.id}
               userLabel={user.email || user.fullName || user.id.slice(0, 8)}
@@ -256,6 +270,7 @@ export function AdminUsersPage() {
 
 export function AdminAssetsPage() {
   const desk = useAdminDesk()
+  const { configured } = useAuth()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<string | null>(null)
   const filtered = desk.assets.filter((asset) => matches(query, [asset.symbol, asset.name, asset.providerAssetId]))
@@ -290,7 +305,7 @@ export function AdminAssetsPage() {
         <div className="w-full max-w-sm">
           <TextField id="assets-search" label="Search" value={query} onChange={(event) => { setQuery(event.target.value); paging.setPage(1) }} />
         </div>
-        <Button variant="secondary" disabled>
+        <Button variant="secondary" disabled title="New symbols are added in the database catalogue.">
           Add asset
         </Button>
       </div>
@@ -318,10 +333,18 @@ export function AdminAssetsPage() {
           <p className="mt-2 text-muted">Provider ID {asset.providerAssetId}. Quote {asset.quoteCurrency}.</p>
           <p className="mt-1 text-muted">Minimum order {formatAmount(asset.minOrder)}. Simulated withdrawal fee {formatAmount(asset.withdrawalFee)}.</p>
           <p className="mt-3 text-xs text-muted">{pairs.length === 0 ? 'No trading pairs use this asset.' : pairs.map((pair) => pair.symbol).join(', ')}</p>
-          <div className="mt-4">
-            <RecordActions>List|Delist|Enable trading|Disable trading|Add pair</RecordActions>
-            <p className="mt-2 text-xs text-muted">Catalogue changes are not saved from this screen. Delisting, when it is enabled later, will keep historical trades.</p>
-          </div>
+          <AssetControls
+            key={asset.id}
+            assetId={asset.id}
+            listed={asset.listed}
+            tradingEnabled={asset.tradingEnabled}
+            depositsEnabled={asset.depositsEnabled}
+            withdrawalsEnabled={asset.withdrawalsEnabled}
+            minOrder={asset.minOrder}
+            withdrawalFee={asset.withdrawalFee}
+            configured={configured && desk.status === 'ready'}
+            onSaved={desk.reload}
+          />
         </section>
       ) : null}
     </AppPage>
@@ -376,7 +399,7 @@ export function AdminDepositsPage() {
           id: row.id,
           cells: {
             user: person(desk.profiles, row.userId),
-            currency: row.symbol,
+            currency: assetMark(desk.assets, row.symbol),
             amount: formatAmount(row.amount),
             status: labelize(row.status),
             date: when(row.createdAt),
@@ -440,7 +463,7 @@ export function AdminWithdrawalsPage() {
           id: item.id,
           cells: {
             user: person(desk.profiles, item.userId),
-            asset: item.symbol,
+            asset: assetMark(desk.assets, item.symbol),
             amount: formatAmount(item.amount),
             status: labelize(item.status),
             date: when(item.createdAt),
@@ -472,6 +495,7 @@ export function AdminWithdrawalsPage() {
 
 export function AdminOrdersPage() {
   const desk = useAdminDesk()
+  const { configured } = useAuth()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<string | null>(null)
   const filtered = desk.orders.filter((order) => matches(query, [order.id, person(desk.profiles, order.userId), order.pair, order.side, order.status]))
@@ -481,16 +505,13 @@ export function AdminOrdersPage() {
   return (
     <AppPage
       title="Orders"
-      description="Simulated orders across accounts. Completed orders are not edited from this screen."
+      description="Simulated orders across accounts. An open order can be cancelled. Completed orders stay as history."
       notice={desk.status === 'error' && desk.error ? <Notice title="Records unavailable">{desk.error}</Notice> : undefined}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="w-full max-w-sm">
           <TextField id="orders-search" label="Search" value={query} onChange={(event) => { setQuery(event.target.value); paging.setPage(1) }} />
         </div>
-        <Button variant="secondary" disabled>
-          Cancel open order
-        </Button>
       </div>
       <AdminTable
         caption="Orders"
@@ -511,7 +532,7 @@ export function AdminOrdersPage() {
           id: item.id,
           cells: {
             user: person(desk.profiles, item.userId),
-            pair: item.pair,
+            pair: pairMark(desk.assets, desk.pairs, item.pair),
             side: labelize(item.side),
             type: labelize(item.type),
             price: item.price === null ? EMPTY_VALUE : formatAmount(item.price),
@@ -525,14 +546,19 @@ export function AdminOrdersPage() {
         }))}
         loading={desk.status === 'loading'}
         emptyTitle="No orders"
-        emptyBody={adminEmpty(desk.status, 'Cancellation stays disabled until the trading engine can release locked funds.')}
+        emptyBody={adminEmpty(desk.status, 'Open orders can be cancelled from the record. Filled orders stay unchanged.')}
       />
       <Pager page={paging.page} pageCount={paging.pageCount} onPage={paging.setPage} />
       {order ? (
         <section className="rounded-lg border border-line bg-panel p-4 text-sm">
           <h2 className="font-medium">{order.pair} · {labelize(order.side)} · {labelize(order.status)}</h2>
           <p className="mt-2 text-muted">{person(desk.profiles, order.userId)} · {when(order.createdAt)}</p>
-          <p className="mt-2 text-xs text-muted">Cancelling an open order is disabled. Filled history is left unchanged.</p>
+          <AdminOrderCancel
+            orderId={order.id}
+            status={order.status}
+            configured={configured && desk.status === 'ready'}
+            onSaved={desk.reload}
+          />
         </section>
       ) : null}
     </AppPage>
@@ -570,7 +596,7 @@ export function AdminTradesPage() {
           id: trade.id,
           cells: {
             user: person(desk.profiles, trade.userId),
-            pair: trade.pair,
+            pair: pairMark(desk.assets, desk.pairs, trade.pair),
             side: labelize(trade.side),
             price: formatAmount(trade.price),
             amount: formatAmount(trade.amount),
@@ -629,7 +655,7 @@ export function AdminTransactionsPage() {
             id: <span className="font-mono text-xs">{row.id.slice(0, 8)}</span>,
             user: person(desk.profiles, row.userId),
             type: row.type === 'admin_adjustment' ? <span className="text-warn">Admin adjustment</span> : labelize(row.type),
-            asset: row.symbol,
+            asset: assetMark(desk.assets, row.symbol),
             amount: formatAmount(row.amount),
             status: labelize(row.status),
             date: when(row.createdAt),
@@ -647,7 +673,7 @@ export function AdminTransactionsPage() {
 export function AdminAuditPage() {
   const desk = useAdminDesk()
   const [query, setQuery] = useState('')
-  const assets = new Map(desk.assets.map((asset) => [asset.id, asset.symbol]))
+  const assets = new Map(desk.assets.map((asset) => [asset.id, asset.listed ? asset.symbol : `${asset.symbol} · delisted`]))
   const filtered = desk.audit.filter((row) => matches(query, [row.action, row.note, person(desk.profiles, row.adminId), person(desk.profiles, row.targetUserId), assets.get(row.assetId) ?? '']))
   const paging = usePage(filtered.length)
 
@@ -702,24 +728,18 @@ export function AdminSettingsPage() {
   return (
     <AppPage
       title="Platform settings"
-      description="Simulated fees and system settings. Role changes are not available on this form."
+      description="Simulated trading fees. Role changes are on the user record, and only a super administrator can make them."
       notice={
-        <Notice title={closed ? 'ADMINISTRATOR ACCESS ONLY' : 'SUPER ADMIN CONTROLS ARE CLOSED'}>
+        <Notice title={closed ? 'ADMINISTRATOR ACCESS ONLY' : superAdmin ? 'SUPER ADMIN' : 'SUPER ADMIN CONTROLS'}>
           {closed
             ? 'This account is an administrator, not a super administrator. It cannot promote anyone or save platform settings.'
-            : 'A normal administrator cannot promote anyone, including themselves. Nothing on this form is saved.'}
+            : superAdmin
+              ? 'Fee changes are audited. This form cannot grant the super administrator role.'
+              : 'A normal administrator cannot promote anyone, including themselves. Fees are not saved until a super administrator is signed in.'}
         </Notice>
       }
     >
-      <form className="grid max-w-xl gap-4" onSubmit={(event) => event.preventDefault()}>
-        <TextField id="fee-maker" label="Simulated maker fee" disabled placeholder="Not configured" />
-        <TextField id="fee-taker" label="Simulated taker fee" disabled placeholder="Not configured" />
-        <TextField id="fee-withdraw" label="Default simulated withdrawal fee" disabled placeholder="Not configured" />
-        <Button type="submit" disabled>
-          Save settings
-        </Button>
-        <p className="text-xs text-muted">There is no control here to change a role to super administrator.</p>
-      </form>
+      <FeeSettings configured={configured} superAdmin={superAdmin} />
     </AppPage>
   )
 }

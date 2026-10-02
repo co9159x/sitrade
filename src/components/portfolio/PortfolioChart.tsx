@@ -53,7 +53,7 @@ export function PortfolioChart({
                   <span>{slice.label}</span>
                   <span className="font-mono text-text">{formatMoney(slice.value, currency)}</span>
                 </div>
-                <div className="mt-1 h-2 rounded-full bg-bg">
+                <div className="mt-1 h-2 rounded-full bg-bg" role="img" aria-label={`${slice.label}, ${((slice.value / total) * 100).toFixed(1)} percent of the marked portfolio`}>
                   <div className="h-2 rounded-full bg-accent" style={{ width: `${(slice.value / total) * 100}%` }} />
                 </div>
               </li>
@@ -95,7 +95,8 @@ function PerformanceLine({ points, currency }: { points: { time: number; value: 
   return (
     <div className="px-4 py-4">
       <p className="font-mono text-sm">{last ? formatMoney(last.value, currency) : ''}</p>
-      <svg viewBox={`0 0 ${width} ${height}`} className="mt-2 h-40 w-full" role="img" aria-label="Holding value over 30 days">
+      <p className="mt-1 text-xs text-muted">Low {formatMoney(min, currency)} · High {formatMoney(max, currency)}</p>
+      <svg viewBox={`0 0 ${width} ${height}`} className="mt-2 h-36 w-full sm:h-48" role="img" aria-label={`Holding value over 30 days, from ${formatMoney(min, currency)} to ${formatMoney(max, currency)}`}>
         <path d={path} fill="none" stroke="currentColor" className="text-accent" strokeWidth="2" />
       </svg>
       <p className="text-xs text-muted">

@@ -116,10 +116,16 @@ export function OrderForm({
               type="button"
               role="tab"
               aria-selected={side === item}
+              tabIndex={side === item ? 0 : -1}
               className={`h-9 rounded-md text-sm font-medium ${
                 side === item ? (item === 'buy' ? 'bg-up text-bg' : 'bg-down text-white') : 'text-muted'
               }`}
               onClick={() => setSide(item)}
+              onKeyDown={(event) => {
+                if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+                event.preventDefault()
+                setSide(item === 'buy' ? 'sell' : 'buy')
+              }}
             >
               {item === 'buy' ? 'Buy' : 'Sell'}
             </button>
@@ -161,16 +167,16 @@ export function OrderForm({
         </div>
         <dl className="mt-3 space-y-1 text-xs text-muted">
           <div className="flex justify-between gap-3">
-            <dt>Available balance</dt>
-            <dd className="font-mono text-text">{available === null ? EMPTY_VALUE : `${formatAmount(available)} ${availableLabel ?? ''}`.trim()}</dd>
+            <dt className="shrink-0">Available balance</dt>
+            <dd className="min-w-0 text-right font-mono break-all text-text">{available === null ? EMPTY_VALUE : `${formatAmount(available)} ${availableLabel ?? ''}`.trim()}</dd>
           </div>
           <div className="flex justify-between gap-3">
-            <dt>Estimated fee</dt>
-            <dd className="font-mono text-text">{fee === null ? EMPTY_VALUE : `${formatAmount(fee)} ${pair?.quoteSymbol ?? ''}`.trim()}</dd>
+            <dt className="shrink-0">Estimated fee</dt>
+            <dd className="min-w-0 text-right font-mono break-all text-text">{fee === null ? EMPTY_VALUE : `${formatAmount(fee)} ${pair?.quoteSymbol ?? ''}`.trim()}</dd>
           </div>
           <div className="flex justify-between gap-3">
-            <dt>Reference price</dt>
-            <dd className="font-mono text-text">{referencePrice === null ? EMPTY_VALUE : formatAmount(referencePrice)}</dd>
+            <dt className="shrink-0">Reference price</dt>
+            <dd className="min-w-0 text-right font-mono break-all text-text">{referencePrice === null ? EMPTY_VALUE : formatAmount(referencePrice)}</dd>
           </div>
         </dl>
         {error || balanceError ? <p className="mt-3 text-xs text-down" role="alert">{error || balanceError}</p> : null}
