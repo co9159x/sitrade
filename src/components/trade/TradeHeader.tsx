@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useDisplayCurrency } from '@/hooks/useDisplayCurrency'
-import { EMPTY_VALUE, formatDateTime, formatMoney, formatPercent } from '@/utils/format'
+import { EMPTY_VALUE, formatCompact, formatDateTime, formatMoney, formatPercent } from '@/utils/format'
 import { useMarketDataStatus } from '@/hooks/useMarketDataStatus'
 import type { MarketPrice } from '@/services/marketData/types'
 
@@ -8,14 +8,16 @@ export function TradeHeader({
   symbol,
   name,
   price,
+  pairLabel,
 }: {
   symbol: string | null
   name?: string
   price: MarketPrice | null
+  pairLabel?: string | null
 }) {
   const market = useMarketDataStatus()
   const { currency } = useDisplayCurrency()
-  const pair = symbol ? `${symbol}/${currency}` : 'Not selected'
+  const pair = pairLabel || (symbol ? `${symbol}/${currency}` : 'Not selected')
 
   return (
     <section className="grid grid-cols-2 gap-3 rounded-lg border border-line bg-panel p-4 xl:grid-cols-6">
@@ -28,6 +30,7 @@ export function TradeHeader({
       <HeaderStat label="24h change" value={price?.change24hPercent === null || price?.change24hPercent === undefined ? EMPTY_VALUE : formatPercent(price.change24hPercent)} tone={toneFor(price?.change24hPercent)} />
       <HeaderStat label="24h high" value={price?.high24h === null || price?.high24h === undefined ? EMPTY_VALUE : formatMoney(price.high24h, price.currency)} />
       <HeaderStat label="24h low" value={price?.low24h === null || price?.low24h === undefined ? EMPTY_VALUE : formatMoney(price.low24h, price.currency)} />
+      <HeaderStat label="24h volume" value={price?.volume24h === null || price?.volume24h === undefined ? EMPTY_VALUE : formatCompact(price.volume24h, price.currency)} />
       <div>
         <p className="text-xs text-muted">Market status</p>
         <p className={`mt-1 text-sm ${market.state === 'live' ? 'text-up' : 'text-warn'}`}>{market.message}</p>

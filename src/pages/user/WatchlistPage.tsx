@@ -6,7 +6,7 @@ import { DataTable, type TableColumn, type TableRow } from '@/components/ui/Data
 import { Notice } from '@/components/ui/Notice'
 import { TextField } from '@/components/ui/TextField'
 import { deskEmpty, useDesk } from '@/hooks/useDesk'
-import { assetsForQuotes, useMarketPrices } from '@/hooks/useMarketPrices'
+import { assetsForQuotes, useCandles, useMarketPrices } from '@/hooks/useMarketPrices'
 
 const columns: TableColumn[] = [
   { key: 'asset', label: 'Asset' },
@@ -32,21 +32,23 @@ export function WatchlistPage() {
     () =>
       desk.watchlist
         .filter((item) => !needle || item.symbol.toLowerCase().includes(needle) || item.name.toLowerCase().includes(needle))
-        .map((item) => ({
+        .map((item) => {
+          const asset = quoted.assets.find((entry) => entry.id === item.assetId || entry.symbol === item.symbol)
+          return {
           id: item.assetId,
           cells: {
-            asset: assetLink(item.symbol, item.name),
-            ...quoteCells(market.byId.get(quoted.assets.find((entry) => entry.id === item.assetId || entry.symbol === item.symbol)?.providerAssetId ?? '')),
-            chart: <span className="text-xs text-muted">Open the terminal for the chart</span>,
+            asset: assetLink(item.symbol, item.name, asset?.providerAssetId),
+            ...quoteCells(market.byId.get(asset?.providerAssetId ?? '')),
+            chart: <MiniRange providerAssetId={asset?.providerAssetId} />,
           },
-        })),
+        }}),
     [desk.watchlist, market.byId, needle, quoted.assets],
   )
 
   return (
     <AppPage
       title="Watchlist"
-      description="Assets saved on this account. Prices follow the display currency. The range chart is on the trade terminal."
+      description="Assets saved on this account. Prices and the one-day range follow CoinGecko."
       notice={desk.status === 'error' && desk.error ? <Notice title="Records unavailable">{desk.error}</Notice> : undefined}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
@@ -73,5 +75,23 @@ export function WatchlistPage() {
         emptyBody={deskEmpty(desk.status, 'No assets are saved on this account.')}
       />
     </AppPage>
+  )
+}
+
+function MiniRange({ providerAssetId }: { providerAssetId?: string }) {
+  const chart = useCandles(providerAssetId ?? null, '1D')
+  const closes = chart.candles.map((candle) => candle.close)
+  if (!providerAssetId || closes.length < 2) return <span className="text-xs text-muted">Not available</span>
+  const min = Math.min(...closes)
+  const max = Math.max(...closes)
+  const span = max - min || 1
+  const points = closes
+    .map((value, index) => `${(index / (closes.length - 1)) * 72},${18 - ((value - min) / span) * 16}`)
+    .join(' ')
+  const rising = closes[closes.length - 1] >= closes[0]
+  return (
+    <svg viewBox="0 0 72 20" className="h-5 w-[72px]" aria-hidden="true">
+      <polyline fill="none" stroke={rising ? '#2fce8f' : '#ff5c6a'} strokeWidth="1.5" points={points} />
+    </svg>
   )
 }

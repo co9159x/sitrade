@@ -66,14 +66,14 @@ export function ConfirmationModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
-      <button type="button" className="absolute inset-0 bg-black/70" aria-label="Close dialog" onClick={onClose} tabIndex={-1} />
+      <button type="button" className="absolute inset-0 bg-black/65 backdrop-blur-sm" aria-label="Close dialog" onClick={onClose} tabIndex={-1} />
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={bodyId}
-        className="relative w-full max-w-md rounded-lg border border-line bg-panel p-5"
+        className="glass-float relative w-full max-w-md rounded-2xl p-5"
       >
         <h2 id={titleId} className="text-base font-semibold">
           {title}

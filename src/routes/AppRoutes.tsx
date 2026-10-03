@@ -21,6 +21,7 @@ import { LandingPage } from '@/pages/LandingPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { DashboardPage } from '@/pages/user/DashboardPage'
 import { DepositPage } from '@/pages/user/DepositPage'
+import { CoinPage } from '@/pages/user/CoinPage'
 import { MarketsPage } from '@/pages/user/MarketsPage'
 import { NotificationsPage } from '@/pages/user/NotificationsPage'
 import { OrdersPage } from '@/pages/user/OrdersPage'
@@ -48,7 +49,9 @@ export function AppRoutes() {
         <Route element={<UserLayout />}>
           <Route path={paths.dashboard} element={<DashboardPage />} />
           <Route path={paths.markets} element={<MarketsPage />} />
+          <Route path="/markets/:assetId" element={<CoinPage />} />
           <Route path={paths.trade} element={<TradePage />} />
+          <Route path="/trade/:pair" element={<TradePage />} />
           <Route path={paths.portfolio} element={<PortfolioPage />} />
           <Route path={paths.orders} element={<OrdersPage />} />
           <Route path={paths.transactions} element={<TransactionsPage />} />

@@ -36,7 +36,7 @@ export function DataTable({
     </div>
   )
   return (
-    <div className="overflow-hidden rounded-lg border border-line bg-panel">
+    <div className="surface-solid overflow-hidden rounded-xl">
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full border-collapse text-left text-sm">
           <caption className="sr-only">{caption}</caption>

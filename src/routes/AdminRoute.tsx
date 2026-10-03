@@ -1,4 +1,5 @@
 import { Link, Navigate, Outlet } from 'react-router-dom'
+import { buttonClass } from '@/components/ui/Button'
 import { LoadingScreen } from '@/components/ui/LoadingScreen'
 import { useAuth } from '@/hooks/useAuth'
 import { isOperator } from '@/services/account'
@@ -21,10 +22,10 @@ export function AdminRoute() {
           The role is read from the database. Opening this address, or submitting the sign-in form, does not grant administrator access.
         </p>
         <div className="mt-6 flex gap-3">
-          <Link to={paths.home} className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-sm text-white">
+          <Link to={paths.home} className={buttonClass()}>
             Back to site
           </Link>
-          <Link to={paths.adminLogin} className="inline-flex h-11 items-center rounded-md border border-line px-4 text-sm">
+          <Link to={paths.adminLogin} className={buttonClass({ variant: 'secondary' })}>
             Admin sign in
           </Link>
         </div>

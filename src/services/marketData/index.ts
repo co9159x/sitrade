@@ -1,4 +1,4 @@
-import { CoinGeckoProvider, MarketDataError, clearMarketCache } from '@/services/marketData/coingecko'
+import { CoinGeckoCatalogue, CoinGeckoProvider, MarketDataError, clearMarketCache } from '@/services/marketData/coingecko'
 import type { MarketDataProvider, MarketDataStatus, MarketPrice, Timeframe } from '@/services/marketData/types'
 
 const providerName = () => import.meta.env.VITE_PUBLIC_MARKET_DATA_PROVIDER?.trim() || 'coingecko'
@@ -206,4 +206,34 @@ export function describeMarketDataConnection(): MarketDataStatus {
 
 export async function loadCandles(providerAssetId: string, timeframe: Timeframe) {
   return getMarketDataProvider().getOHLCData(providerAssetId, timeframe)
+}
+
+export async function loadHistory(providerAssetId: string, range: string) {
+  return getMarketDataProvider().getHistoricalPrices(providerAssetId, range)
+}
+
+let catalogue: CoinGeckoCatalogue | null = null
+
+function liveCatalogue() {
+  if (!providerIsLive()) {
+    throw new MarketDataError('Market data provider is not connected. No prices were generated.', 'response')
+  }
+  catalogue ??= new CoinGeckoCatalogue()
+  return catalogue
+}
+
+export function loadMarketPage(page: number, order: 'market_cap_desc' | 'volume_desc' = 'market_cap_desc') {
+  return liveCatalogue().getMarketPage(page, order)
+}
+
+export function searchMarketAssets(query: string) {
+  return liveCatalogue().searchAssets(query)
+}
+
+export function loadTrendingAssets() {
+  return liveCatalogue().getTrending()
+}
+
+export function loadCoinProfile(providerAssetId: string) {
+  return liveCatalogue().getCoinProfile(providerAssetId)
 }

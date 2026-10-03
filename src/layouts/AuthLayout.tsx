@@ -8,8 +8,10 @@ export function AuthLayout() {
   return (
     <div className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_32rem]">
       <SkipLink />
-      <section className="relative hidden flex-col justify-between overflow-hidden border-r border-line bg-panel p-10 lg:flex">
-        <div className="desk-grid pointer-events-none absolute inset-0 opacity-70" />
+      <section className="relative hidden flex-col justify-between overflow-hidden border-r border-white/10 p-10 lg:flex">
+        <img src="/hero/09.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/75 to-bg/35" />
+        <div className="desk-grid pointer-events-none absolute inset-0 opacity-50" />
         <div className="relative">
           <LogoLink />
         </div>

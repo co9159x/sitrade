@@ -90,7 +90,7 @@ export function AdminDashboardPage() {
         </>
       }
     >
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
         <StatCard label="Registered users" value={countLabel(ready, desk.profiles.length)} hint="Accounts stored in the database." />
         <StatCard label="Active users" value={countLabel(ready, activeUsers.length)} hint="Accounts that are not suspended." />
         <StatCard label="Simulated deposits" value={countLabel(ready, desk.deposits.length)} hint="Count of training deposits. Amounts are not added across assets." />
@@ -181,9 +181,9 @@ export function AdminUsersPage() {
       registered: when(profile.createdAt),
       activity: when(lastActivity.get(profile.id) ?? profile.updatedAt),
       view: (
-        <button type="button" className="text-xs text-warn" onClick={() => setSelected(profile.id)}>
+        <Button type="button" size="compact" variant="ghost" onClick={() => setSelected(profile.id)}>
           View
-        </button>
+        </Button>
       ),
     },
   }))
@@ -286,9 +286,9 @@ export function AdminAssetsPage() {
       deposits: flag(asset.depositsEnabled),
       withdrawals: flag(asset.withdrawalsEnabled),
       view: (
-        <button type="button" className="text-xs text-warn" onClick={() => setSelected(asset.id)}>
+        <Button type="button" size="compact" variant="ghost" onClick={() => setSelected(asset.id)}>
           View
-        </button>
+        </Button>
       ),
     },
   }))
@@ -403,7 +403,7 @@ export function AdminDepositsPage() {
             amount: formatAmount(row.amount),
             status: labelize(row.status),
             date: when(row.createdAt),
-            view: <button type="button" className="text-xs text-warn" onClick={() => setSelected(row.id)}>View</button>,
+            view: <Button type="button" size="compact" variant="ghost" onClick={() => setSelected(row.id)}>View</Button>,
           },
         }))}
         loading={desk.status === 'loading'}
@@ -467,7 +467,7 @@ export function AdminWithdrawalsPage() {
             amount: formatAmount(item.amount),
             status: labelize(item.status),
             date: when(item.createdAt),
-            view: <button type="button" className="text-xs text-warn" onClick={() => setSelected(item.id)}>View</button>,
+            view: <Button type="button" size="compact" variant="ghost" onClick={() => setSelected(item.id)}>View</Button>,
           },
         }))}
         loading={desk.status === 'loading'}
@@ -541,7 +541,7 @@ export function AdminOrdersPage() {
             remaining: formatAmount(item.remaining),
             status: labelize(item.status),
             created: when(item.createdAt),
-            view: <button type="button" className="text-xs text-warn" onClick={() => setSelected(item.id)}>View</button>,
+            view: <Button type="button" size="compact" variant="ghost" onClick={() => setSelected(item.id)}>View</Button>,
           },
         }))}
         loading={desk.status === 'loading'}

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { buttonClass } from '@/components/ui/Button'
 import { paths } from '@/routes/paths'
 
 export function AccessMessage({
@@ -14,10 +15,10 @@ export function AccessMessage({
       <h1 className="mt-3 max-w-lg font-display text-4xl font-semibold tracking-tight">{title}</h1>
       <p className="mt-3 max-w-md text-sm leading-6 text-muted">{body}</p>
       <div className="mt-6 flex gap-3">
-        <Link to={paths.home} className="inline-flex h-11 items-center rounded-md bg-accent px-4 text-sm text-white">
+        <Link to={paths.home} className={buttonClass()}>
           Back to site
         </Link>
-        <Link to={paths.login} className="inline-flex h-11 items-center rounded-md border border-line px-4 text-sm">
+        <Link to={paths.login} className={buttonClass({ variant: 'secondary' })}>
           Sign in
         </Link>
       </div>

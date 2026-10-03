@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
-import { assetLink, orderRows, ordersForTab, quoteCells, transactionRows } from '@/components/desk/rows'
+import { assetLink, orderRows, ordersForTab, transactionRows } from '@/components/desk/rows'
 import { PortfolioChart } from '@/components/portfolio/PortfolioChart'
 import { OrderTable } from '@/components/tables/OrderTable'
 import { TransactionTable } from '@/components/tables/TransactionTable'
+import { MarketCard } from '@/components/landing/MarketCard'
 import { AppPage } from '@/components/ui/AppPage'
-import { Button } from '@/components/ui/Button'
+import { Carousel, CarouselCard } from '@/components/ui/Carousel'
+import { Button, buttonClass } from '@/components/ui/Button'
 import { Notice } from '@/components/ui/Notice'
 import { StatCard } from '@/components/ui/StatCard'
 import { deskEmpty, useDesk } from '@/hooks/useDesk'
@@ -67,7 +69,7 @@ export function DashboardPage() {
       description="A summary of the simulated wallet, open orders, and markets. Values stay blank until prices and balances exist."
       notice={desk.status === 'error' && desk.error ? <Notice title="Records unavailable">{desk.error}</Notice> : undefined}
     >
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">
         {stats.map(([label, hint]) => (
           <StatCard
             key={label}
@@ -81,9 +83,11 @@ export function DashboardPage() {
           />
         ))}
       </div>
-      <div className="grid gap-3 lg:grid-cols-2">
-        <PortfolioChart kind="allocation" slices={slices} currency={currency} />
-        <section className="rounded-lg border border-line bg-panel p-4">
+      <div className="grid min-w-0 gap-3 lg:grid-cols-2">
+        <div className="min-w-0">
+          <PortfolioChart kind="allocation" slices={slices} currency={currency} />
+        </div>
+        <section className="min-w-0">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-sm font-medium">Markets</h2>
             <Link to={paths.markets} className="text-xs text-accent-soft">
@@ -95,25 +99,26 @@ export function DashboardPage() {
           ) : markets.length === 0 ? (
             <p className="mt-4 text-sm leading-6 text-muted">{deskEmpty(desk.status, 'No listed assets yet. Prices are not filled in for an empty catalogue.')}</p>
           ) : (
-            <ul className="mt-3 divide-y divide-line">
-              {markets.map((asset) => {
-                const quote = quoteCells(market.byId.get(asset.providerAssetId))
-                return (
-                  <li key={asset.id} className="flex items-center justify-between gap-3 py-2 text-sm">
-                    {assetLink(asset.symbol, asset.name)}
-                    <span className="text-right">
-                      <span className="block font-mono">{quote.price}</span>
-                      <span className="block text-xs">{quote.change}</span>
-                    </span>
-                  </li>
-                )
-              })}
-            </ul>
+            <div className="mt-3">
+              <Carousel label="Dashboard markets">
+                {markets.map((asset, index) => (
+                  <CarouselCard key={asset.id}>
+                    <MarketCard
+                      symbol={asset.symbol}
+                      name={asset.name}
+                      providerAssetId={asset.providerAssetId}
+                      price={market.byId.get(asset.providerAssetId)}
+                      chart={index < 4}
+                    />
+                  </CarouselCard>
+                ))}
+              </Carousel>
+            </div>
           )}
         </section>
       </div>
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <section className="rounded-lg border border-line bg-panel p-4">
+      <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <section className="border-t border-white/10 pt-3">
           <h2 className="text-sm font-medium">Quick buy / sell</h2>
           <p className="mt-2 text-sm leading-6 text-muted">
             Orders are placed on the trade terminal. This card does not submit an order.
@@ -125,12 +130,12 @@ export function DashboardPage() {
             <Button variant="danger" disabled>
               Sell
             </Button>
-            <Link to={paths.trade} className="inline-flex h-11 items-center rounded-md border border-line px-4 text-sm">
+            <Link to={paths.trade} className={buttonClass({ variant: 'secondary' })}>
               Open terminal
             </Link>
           </div>
         </section>
-        <section className="rounded-lg border border-line bg-panel p-4">
+        <section className="border-t border-white/10 pt-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-medium">Watchlist</h2>
             <Link to={paths.watchlist} className="text-xs text-accent-soft">
@@ -140,11 +145,20 @@ export function DashboardPage() {
           {desk.watchlist.length === 0 ? (
             <p className="mt-4 text-sm text-muted">{deskEmpty(desk.status, 'No saved assets yet.')}</p>
           ) : (
-            <ul className="mt-3 space-y-2 text-sm">
-              {desk.watchlist.slice(0, 6).map((item) => (
-                <li key={item.assetId}>{assetLink(item.symbol, item.name)}</li>
-              ))}
-            </ul>
+            <div className="mt-3">
+              <Carousel label="Watchlist">
+                {desk.watchlist.slice(0, 12).map((item) => {
+                  const asset = markets.find((entry) => entry.symbol === item.symbol)
+                  return (
+                    <CarouselCard key={item.assetId}>
+                      <div className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-sm">
+                        {assetLink(item.symbol, item.name, asset?.providerAssetId)}
+                      </div>
+                    </CarouselCard>
+                  )
+                })}
+              </Carousel>
+            </div>
           )}
         </section>
       </div>

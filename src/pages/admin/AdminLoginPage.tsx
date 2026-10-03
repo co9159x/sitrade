@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Button } from '@/components/ui/Button'
+import { Button, buttonClass } from '@/components/ui/Button'
 import { DemoBanner } from '@/components/ui/DemoBanner'
 import { Notice } from '@/components/ui/Notice'
 import { TextField } from '@/components/ui/TextField'
@@ -54,7 +54,7 @@ export function AdminLoginPage() {
           Access is decided by a database role. Submitting this form does not make an account an administrator.
         </p>
         {session && isOperator(profile?.role) ? (
-          <Link to={paths.adminDashboard} className="mt-6 inline-flex h-11 items-center text-sm text-warn">
+          <Link to={paths.adminDashboard} className={buttonClass({ className: 'mt-6 bg-warn text-bg hover:brightness-110' })}>
             Continue to the operations console
           </Link>
         ) : null}
@@ -70,7 +70,7 @@ export function AdminLoginPage() {
             {submitting ? 'Checking access…' : 'Continue'}
           </Button>
         </form>
-        <Link to={paths.home} className="mt-6 text-sm text-muted">
+        <Link to={paths.home} className={buttonClass({ variant: 'ghost', className: 'mt-6' })}>
           Back to the training site
         </Link>
       </main>

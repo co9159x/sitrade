@@ -37,8 +37,8 @@ export function Tabs({
             id={`tab-${label.replace(/\s+/g, '-')}-${tab.id}`}
             aria-selected={selected}
             tabIndex={selected ? 0 : -1}
-            className={`h-9 shrink-0 rounded-md px-3 text-xs font-medium ${
-              selected ? 'bg-panel-raised text-text' : 'text-muted hover:text-text'
+            className={`inline-flex h-9 shrink-0 items-center justify-center rounded-md px-3.5 text-sm font-medium ${
+              selected ? 'border border-white/10 bg-white/5 text-text' : 'text-muted hover:bg-white/5 hover:text-text'
             }`}
             onClick={() => onChange(tab.id)}
             onKeyDown={(event) => {

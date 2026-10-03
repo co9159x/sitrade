@@ -1,7 +1,7 @@
 import { Menu } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { LogoLink } from '@/components/brand/Logo'
-import { Button } from '@/components/ui/Button'
+import { Button, buttonClass } from '@/components/ui/Button'
 import { useAuth } from '@/hooks/useAuth'
 import { useDisplayCurrency } from '@/hooks/useDisplayCurrency'
 import { useMarketDataStatus } from '@/hooks/useMarketDataStatus'
@@ -28,9 +28,9 @@ export function TopNavigation({
   const { currency, setCurrency } = useDisplayCurrency()
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-line bg-bg px-3 md:px-4">
+    <header className="glass-soft flex h-14 shrink-0 items-center justify-between gap-3 rounded-none border-x-0 border-t-0 px-3 md:px-4">
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" className="lg:hidden" aria-label="Open navigation" onClick={onMenu}>
+        <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation" onClick={onMenu}>
           <Menu className="h-4 w-4" aria-hidden="true" />
         </Button>
         <div className="lg:hidden">
@@ -46,7 +46,7 @@ export function TopNavigation({
           id="display-currency"
           value={currency}
           onChange={(event) => setCurrency(event.target.value)}
-          className="h-9 rounded-md border border-line bg-bg px-2 font-mono text-xs text-text"
+          className="h-9 rounded-md border border-white/10 bg-white/5 px-3.5 font-mono text-sm text-text backdrop-blur-md"
         >
           {displayCurrencies.map((code) => (
             <option key={code} value={code}>{code}</option>
@@ -71,7 +71,7 @@ export function TopNavigation({
         ) : (
           <Link
             to={tone === 'admin' ? paths.adminLogin : paths.login}
-            className="inline-flex h-9 items-center rounded-md border border-line px-3 text-xs"
+            className={buttonClass({ variant: 'secondary', size: 'sm' })}
           >
             Sign in
           </Link>

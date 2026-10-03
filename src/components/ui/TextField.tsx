@@ -33,7 +33,7 @@ export function TextField({
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
           className={cn(
-            'h-11 w-full rounded-md border border-line bg-bg px-3 text-sm text-text disabled:cursor-not-allowed disabled:opacity-50',
+            'h-11 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-text backdrop-blur-md focus:border-accent disabled:cursor-not-allowed disabled:opacity-50',
             trailing ? 'pr-11' : '',
             className,
           )}
@@ -75,7 +75,7 @@ export function SelectField({
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={[error ? errorId : null, hint ? hintId : null].filter(Boolean).join(' ') || undefined}
-        className="h-11 w-full rounded-md border border-line bg-bg px-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+        className="h-11 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm backdrop-blur-md focus:border-accent disabled:cursor-not-allowed disabled:opacity-50"
         {...props}
       >
         {children}

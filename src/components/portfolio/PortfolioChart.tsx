@@ -32,7 +32,7 @@ export function PortfolioChart({
             <select
               value={selected}
               onChange={(event) => setSelected(event.target.value)}
-              className="h-8 rounded-md border border-line bg-bg px-2 text-xs text-text"
+              className="h-9 rounded-md border border-white/10 bg-white/5 px-3.5 text-sm text-text"
             >
               <option value="all">All holdings</option>
               {assetSeries.map((item) => (

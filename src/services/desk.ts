@@ -236,3 +236,15 @@ export async function loadDesk(): Promise<DeskSnapshot> {
     }),
   }
 }
+
+export async function setWatchlisted(assetId: string, saved: boolean) {
+  const supabase = getSupabase()
+  if (!supabase) throw new Error('Supabase is not configured.')
+  const { data, error } = await supabase.auth.getUser()
+  if (error || !data.user) throw new Error('Sign in to save a watchlist asset.')
+  const result = saved
+    ? await supabase.from('watchlists').delete().eq('asset_id', assetId).eq('user_id', data.user.id)
+    : await supabase.from('watchlists').insert({ user_id: data.user.id, asset_id: assetId })
+  if (result.error) throw new Error(result.error.message)
+  window.dispatchEvent(new Event('sitrade-desk-refresh'))
+}

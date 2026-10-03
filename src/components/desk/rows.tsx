@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui/Button'
 import type { TableRow } from '@/components/ui/DataTable'
 import type { DeskBalance, DeskOrder, DeskTrade, DeskTransaction } from '@/services/desk'
 import type { MarketPrice } from '@/services/marketData/types'
 import { EMPTY_VALUE, formatAmount, formatCompact, formatDateTime, formatMoney, formatPercent, labelize } from '@/utils/format'
-import { paths } from '@/routes/paths'
 
 const priceHint = 'Reference price unavailable'
 
@@ -44,9 +44,10 @@ export function unavailablePrice() {
   )
 }
 
-export function assetLink(symbol: string, name?: string) {
+export function assetLink(symbol: string, name?: string, providerAssetId?: string) {
+  const to = providerAssetId ? `/markets/${encodeURIComponent(providerAssetId)}` : `/trade/${encodeURIComponent(symbol)}-USDT`
   return (
-    <Link to={`${paths.trade}?symbol=${encodeURIComponent(symbol)}`} className="font-medium hover:text-accent-soft">
+    <Link to={to} className="font-medium hover:text-accent-soft">
       <span className="font-mono">{symbol}</span>
       {name ? <span className="ml-2 text-muted">{name}</span> : null}
     </Link>
@@ -72,9 +73,9 @@ export function orderRows(orders: DeskOrder[], onCancel?: (order: DeskOrder) => 
       fee: formatAmount(order.fee),
       date: order.createdAt ? formatDateTime(order.createdAt) : EMPTY_VALUE,
       action: onCancel && (order.status === 'open' || order.status === 'inactive') ? (
-        <button type="button" className="text-xs text-warn" onClick={() => onCancel(order)}>
+        <Button type="button" size="compact" variant="ghost" onClick={() => onCancel(order)}>
           Cancel
-        </button>
+        </Button>
       ) : EMPTY_VALUE,
     },
   }))

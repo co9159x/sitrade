@@ -109,17 +109,16 @@ export function OrderForm({
   return (
     <section className="rounded-lg border border-line bg-panel p-3" aria-label="Order entry">
       <form onSubmit={(event) => { event.preventDefault(); if (canSubmit) setConfirming(true) }}>
-        <div className="grid grid-cols-2 gap-1 rounded-md bg-bg p-1" role="tablist" aria-label="Order side">
+        <div className="flex w-fit gap-1" role="tablist" aria-label="Order side">
           {(['buy', 'sell'] as const).map((item) => (
-            <button
+            <Button
               key={item}
               type="button"
               role="tab"
               aria-selected={side === item}
               tabIndex={side === item ? 0 : -1}
-              className={`h-9 rounded-md text-sm font-medium ${
-                side === item ? (item === 'buy' ? 'bg-up text-bg' : 'bg-down text-white') : 'text-muted'
-              }`}
+              className="min-w-24"
+              variant={side === item ? (item === 'buy' ? 'up' : 'danger') : 'ghost'}
               onClick={() => setSide(item)}
               onKeyDown={(event) => {
                 if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
@@ -128,20 +127,21 @@ export function OrderForm({
               }}
             >
               {item === 'buy' ? 'Buy' : 'Sell'}
-            </button>
+            </Button>
           ))}
         </div>
         <div className="mt-3 flex gap-1" role="group" aria-label="Order type">
           {orderTypes.map((item) => (
-            <button
+            <Button
               key={item.id}
               type="button"
+              size="small"
+              variant={orderType === item.id ? 'secondary' : 'ghost'}
               aria-pressed={orderType === item.id}
-              className={`h-8 rounded-md px-2 text-xs ${orderType === item.id ? 'bg-panel-raised text-text' : 'text-muted'}`}
               onClick={() => setOrderType(item.id)}
             >
               {item.label}
-            </button>
+            </Button>
           ))}
         </div>
         <div className="mt-3 space-y-3">
@@ -163,6 +163,24 @@ export function OrderForm({
             error={amountError}
             onChange={(event) => setAmount(event.target.value)}
           />
+          <div className="flex flex-wrap gap-1" role="group" aria-label="Amount from available balance">
+            {[0.25, 0.5, 0.75, 1].map((fraction) => (
+              <Button
+                key={fraction}
+                size="compact"
+                variant="ghost"
+                type="button"
+                disabled={available === null || (side === 'buy' && (referencePrice === null || referencePrice <= 0))}
+                onClick={() => {
+                  if (available === null) return
+                  const next = side === 'sell' || referencePrice === null ? available * fraction : (available * fraction) / referencePrice
+                  setAmount(String(Number(next.toPrecision(8))))
+                }}
+              >
+                {fraction * 100}%
+              </Button>
+            ))}
+          </div>
           <TextField id="order-total" label={`Total (${pair?.quoteSymbol ?? 'quote'})`} value={total === null ? '' : formatAmount(total)} disabled readOnly placeholder={EMPTY_VALUE} />
         </div>
         <dl className="mt-3 space-y-1 text-xs text-muted">
@@ -180,7 +198,7 @@ export function OrderForm({
           </div>
         </dl>
         {error || balanceError ? <p className="mt-3 text-xs text-down" role="alert">{error || balanceError}</p> : null}
-        <Button className="mt-4 w-full" type="submit" variant={side === 'buy' ? 'up' : 'danger'} disabled={!canSubmit}>
+        <Button className="mt-4" type="submit" variant={side === 'buy' ? 'up' : 'danger'} disabled={!canSubmit}>
           {submitting ? 'Saving...' : `${side === 'buy' ? 'Buy' : 'Sell'}${pair ? ` ${pair.baseSymbol}` : ''}`}
         </Button>
         <p className="mt-2 text-xs leading-5 text-muted">

@@ -5,6 +5,7 @@ import { adminNav, userNav } from '@/components/navigation/nav'
 import { MobileNav } from '@/components/navigation/MobileNav'
 import { Sidebar } from '@/components/navigation/Sidebar'
 import { TopNavigation } from '@/components/navigation/TopNavigation'
+import { Button } from '@/components/ui/Button'
 import { DemoBanner, PreviewRibbon } from '@/components/ui/DemoBanner'
 import { SkipLink } from '@/components/ui/SkipLink'
 import { useAuth } from '@/hooks/useAuth'
@@ -60,7 +61,7 @@ function Shell({ tone }: { tone: 'user' | 'admin' }) {
         </PreviewRibbon>
       ) : null}
       <div className="flex min-h-0 flex-1">
-        <aside className="hidden w-60 shrink-0 border-r border-line bg-panel lg:flex lg:flex-col">
+        <aside className="glass-primary hidden w-60 shrink-0 rounded-none border-y-0 border-l-0 lg:flex lg:flex-col">
           <div className="flex h-14 items-center border-b border-line px-4">
             <LogoLink />
           </div>
@@ -77,12 +78,12 @@ function Shell({ tone }: { tone: 'user' | 'admin' }) {
       {open ? (
         <div className="fixed inset-0 z-40 lg:hidden">
           <button type="button" className="absolute inset-0 bg-black/70" aria-label="Close navigation" onClick={() => setOpen(false)} />
-          <div ref={drawerRef} className="relative flex h-full w-72 max-w-[85vw] flex-col border-r border-line bg-panel" role="dialog" aria-modal="true" aria-label="Navigation">
+          <div ref={drawerRef} className="glass-float relative flex h-full w-72 max-w-[85vw] flex-col rounded-none" role="dialog" aria-modal="true" aria-label="Navigation">
             <div className="flex h-14 items-center justify-between border-b border-line px-4">
               <LogoLink />
-              <button type="button" className="text-sm text-muted" onClick={() => setOpen(false)}>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
                 Close
-              </button>
+              </Button>
             </div>
             <Sidebar
               items={items}

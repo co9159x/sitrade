@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { balanceRows } from '@/components/desk/rows'
 import { AppPage } from '@/components/ui/AppPage'
+import { buttonClass } from '@/components/ui/Button'
 import { DataTable, type TableColumn } from '@/components/ui/DataTable'
 import { Notice } from '@/components/ui/Notice'
 import { deskEmpty, useDesk } from '@/hooks/useDesk'
@@ -44,7 +45,7 @@ export function WalletPage() {
     >
       <div className="flex flex-wrap gap-2">
         {links.map(([to, label]) => (
-          <Link key={to} to={to} className="inline-flex h-10 items-center rounded-md border border-line px-3 text-sm hover:border-accent">
+          <Link key={to} to={to} className={buttonClass({ variant: 'secondary' })}>
             {label}
           </Link>
         ))}

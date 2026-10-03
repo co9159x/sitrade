@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/Button'
 import {
   createContext,
   useCallback,
@@ -53,7 +54,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <article
             key={toast.id}
             role="status"
-            className={`pointer-events-auto rounded-lg border bg-panel px-3 py-3 shadow-none ${
+            className={`glass-float pointer-events-auto rounded-xl px-3 py-3 ${
               toast.tone === 'error'
                 ? 'border-down'
                 : toast.tone === 'success'
@@ -68,14 +69,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   <p className="mt-1 text-xs text-muted">{toast.description}</p>
                 ) : null}
               </div>
-              <button
-                type="button"
-                className="text-xs text-muted hover:text-text"
-                aria-label={`Dismiss ${toast.title}`}
-                onClick={() => dismiss(toast.id)}
-              >
+              <Button type="button" variant="ghost" size="compact" aria-label={`Dismiss ${toast.title}`} onClick={() => dismiss(toast.id)}>
                 Close
-              </button>
+              </Button>
             </div>
           </article>
         ))}

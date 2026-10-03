@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { Button } from '@/components/ui/Button'
+import { Button, buttonClass } from '@/components/ui/Button'
 import { Notice } from '@/components/ui/Notice'
 import { TextField } from '@/components/ui/TextField'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
@@ -46,7 +46,7 @@ export function ResetPasswordPage() {
           <Notice tone="warning" title="Reset link required">
             Open the link from the reset email in this browser. No password was changed.
           </Notice>
-          <Link to={paths.login} className="mt-4 inline-block text-sm text-accent">
+          <Link to={paths.login} className={buttonClass({ variant: 'secondary', className: 'mt-4' })}>
             Back to sign in
           </Link>
         </div>

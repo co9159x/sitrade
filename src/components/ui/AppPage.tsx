@@ -19,7 +19,7 @@ export function AppPage({
   useDocumentTitle(title)
 
   return (
-    <div className={cn('flex flex-col gap-4', width === 'contained' && 'mx-auto w-full max-w-7xl')}>
+    <div className={cn('flex flex-col gap-3', width === 'contained' && 'mx-auto w-full max-w-7xl')}>
       <PageHeader title={title} description={description} />
       {notice}
       {children}

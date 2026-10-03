@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Button, buttonClass } from '@/components/ui/Button'
 import { Notice } from '@/components/ui/Notice'
 import { TextField } from '@/components/ui/TextField'
 import { useToast } from '@/context/ToastContext'
@@ -69,7 +69,7 @@ export function RegisterPage() {
           value={password}
           error={errors.password}
           trailing={
-            <button type="button" aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword((value) => !value)}>
+            <button type="button" className={buttonClass({ variant: 'ghost', size: 'icon' })} aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword((value) => !value)}>
               {showPassword ? <EyeOff className="h-4 w-4 text-muted" /> : <Eye className="h-4 w-4 text-muted" />}
             </button>
           }
