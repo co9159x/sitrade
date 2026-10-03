@@ -24,8 +24,8 @@ const profileCache = new Map<string, CacheEntry<CoinProfile>>()
 function apiBase() {
   const configured = import.meta.env.VITE_PUBLIC_COINGECKO_API_URL?.trim()
   if (configured) return configured.replace(/\/$/, '')
-  if (import.meta.env.DEV) return '/coingecko/api/v3'
-  return 'https://api.coingecko.com/api/v3'
+  // Same-origin proxy: Vite in development, Netlify in production.
+  return '/coingecko/api/v3'
 }
 
 function quoteCurrency() {
